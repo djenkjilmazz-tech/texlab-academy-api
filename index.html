@@ -4,36 +4,28 @@
   <title>TexLab Academy</title>
   <style>
     body { font-family: Arial; text-align: center; padding: 40px; }
-    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
-    li { margin: 15px 0; }
-    .card {
-      border: 1px solid #ddd;
-      padding: 15px;
-      margin: 10px auto;
-      width: 300px;
-      border-radius: 8px;
-    }
+    button { margin: 5px; padding: 10px; }
+    .card { border:1px solid #ddd; padding:15px; margin:10px; }
   </style>
 </head>
 <body>
 
 <h1>🚀 TexLab Academy</h1>
-<p>AI-powered textile training platform</p>
 
-<button onclick="loadCourses()">Load Courses</button>
+<button onclick="loadCourses()">Courses</button>
+<button onclick="loadISO()">ISO 17025 Audit</button>
 
-<div id="courses"></div>
+<div id="content"></div>
 
 <script>
 async function loadCourses() {
   const res = await fetch('/courses');
   const data = await res.json();
 
-  document.getElementById('courses').innerHTML =
+  document.getElementById('content').innerHTML =
     data.map(c => `
       <div class="card">
         <h3>${c.title}</h3>
-        <p>Equipment: ${c.equipment}</p>
         <button onclick="startExam(${c.id})">Start Exam</button>
       </div>
     `).join('');
@@ -41,23 +33,50 @@ async function loadCourses() {
 
 async function startExam(id) {
   const res = await fetch('/exam/' + id);
-  const questions = await res.json();
+  const q = await res.json();
 
-  alert("Question: " + questions[0].q);
+  alert(q[0].q);
 
-  submitExam(id);
+  const submit = await fetch('/exam/' + id + '/submit', { method:'POST' });
+  const result = await submit.json();
+
+  window.open('/certificate/' + result.certificateId);
 }
 
-async function submitExam(id) {
-  const res = await fetch('/exam/' + id + '/submit', {
-    method: 'POST'
+async function loadISO() {
+  const res = await fetch('/iso17025');
+  const data = await res.json();
+
+  document.getElementById('content').innerHTML =
+    data.map(c => `
+      <div class="card">
+        ${c.clause} - ${c.title}
+        <br/>
+        Status: ${c.status ? "✅" : "❌"}
+        <br/>
+        <button onclick="mark('${c.clause}')">Mark Done</button>
+      </div>
+    `).join('');
+
+  loadScore();
+}
+
+async function mark(clause) {
+  await fetch('/iso17025/update', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({clause})
   });
 
-  const result = await res.json();
+  loadISO();
+}
 
-  alert("Passed! Certificate ID: " + result.certificateId);
+async function loadScore() {
+  const res = await fetch('/iso17025/score');
+  const data = await res.json();
 
-  window.open('/certificate/' + result.certificateId, '_blank');
+  document.getElementById('content').innerHTML +=
+    `<h2>Readiness Score: ${data.score}%</h2>`;
 }
 </script>
 

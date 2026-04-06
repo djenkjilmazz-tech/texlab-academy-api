@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>TexLab Academy</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 40px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    li { margin: 10px 0; }
+  </style>
+</head>
 <body>
-<h1>TexLab Academy</h1>
-<button onclick="load()">Load Courses</button>
-<ul id="list"></ul>
+
+<h1>🚀 TexLab Academy</h1>
+<p>AI-powered textile training platform</p>
+
+<button onclick="loadCourses()">Load Courses</button>
+
+<ul id="courses"></ul>
+
 <script>
-async function load(){
- let r=await fetch('/courses');
- let d=await r.json();
- document.getElementById('list').innerHTML=
- d.map(c=>'<li>'+c.title+'</li>').join('');
+async function loadCourses() {
+  const res = await fetch('/courses');
+  const data = await res.json();
+
+  document.getElementById('courses').innerHTML =
+    data.map(c => `
+      <li>
+        <b>${c.title}</b><br/>
+        Equipment: ${c.equipment}
+      </li>
+    `).join('');
 }
 </script>
+
 </body>
 </html>

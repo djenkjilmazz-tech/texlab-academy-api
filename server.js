@@ -3,19 +3,24 @@ const path = require('path');
 const app = express();
 
 app.use(express.json());
-app.use(express.static(__dirname));
+
+// 🔥 STATIC DOSYA YOLUNU NET VER
+app.use(express.static(path.join(__dirname)));
 
 let courses = [
   { id: 1, title: "ISO 3071 pH Test", equipment: "pH Meter" }
 ];
 
-// API
 app.get('/courses', (req, res) => res.json(courses));
 
-// Ana sayfa
+// 🔥 ROOT ROUTE NET TANIMLA
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Server
+// TEST
+app.get('/test', (req,res)=>{
+  res.send("WORKING");
+});
+
 app.listen(3000, () => console.log("TexLab Full System Running"));

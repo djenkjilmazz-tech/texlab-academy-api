@@ -4,8 +4,15 @@
   <title>TexLab Academy</title>
   <style>
     body { font-family: Arial; text-align: center; padding: 40px; }
-    button { padding: 10px 20px; font-size: 16px; }
-    li { margin: 10px 0; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+    li { margin: 15px 0; }
+    .card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 10px auto;
+      width: 300px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -15,7 +22,7 @@
 
 <button onclick="loadCourses()">Load Courses</button>
 
-<ul id="courses"></ul>
+<div id="courses"></div>
 
 <script>
 async function loadCourses() {
@@ -24,11 +31,33 @@ async function loadCourses() {
 
   document.getElementById('courses').innerHTML =
     data.map(c => `
-      <li>
-        <b>${c.title}</b><br/>
-        Equipment: ${c.equipment}
-      </li>
+      <div class="card">
+        <h3>${c.title}</h3>
+        <p>Equipment: ${c.equipment}</p>
+        <button onclick="startExam(${c.id})">Start Exam</button>
+      </div>
     `).join('');
+}
+
+async function startExam(id) {
+  const res = await fetch('/exam/' + id);
+  const questions = await res.json();
+
+  alert("Question: " + questions[0].q);
+
+  submitExam(id);
+}
+
+async function submitExam(id) {
+  const res = await fetch('/exam/' + id + '/submit', {
+    method: 'POST'
+  });
+
+  const result = await res.json();
+
+  alert("Passed! Certificate ID: " + result.certificateId);
+
+  window.open('/certificate/' + result.certificateId, '_blank');
 }
 </script>
 

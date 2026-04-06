@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>TexLab Academy</h1>
+<button onclick="load()">Load Courses</button>
+<ul id="list"></ul>
+<script>
+async function load(){
+ let r=await fetch('/courses');
+ let d=await r.json();
+ document.getElementById('list').innerHTML=
+ d.map(c=>'<li>'+c.title+'</li>').join('');
+}
+</script>
+</body>
+</html>

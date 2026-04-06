@@ -1,6 +1,0 @@
-services:
-- type: web
-  name: texlab-api
-  env: node
-  buildCommand: npm install && npm run build
-  startCommand: npm start
